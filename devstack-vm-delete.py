@@ -21,12 +21,13 @@
 import json
 import os
 import sys
-from statsd import statsd
 import traceback
 import urllib
 
-import vmdatabase
-import utils
+import statsd
+
+from devstack_gate import utils
+from devstack_gate import vmdatabase
 
 NODE_NAME = sys.argv[1]
 UPSTREAM_BUILD_URL = os.environ.get('UPSTREAM_BUILD_URL', '')
@@ -48,21 +49,21 @@ def main():
             fd = urllib.urlopen(UPSTREAM_BUILD_URL + 'api/json')
             data = json.load(fd)
             result = data['result']
-            if statsd and result == 'SUCCESS':
+            if statsd.statsd and result == 'SUCCESS':
                 dt = int(data['duration'])
 
                 key = 'devstack.job.%s' % UPSTREAM_JOB_NAME
-                statsd.timing(key + '.runtime', dt)
-                statsd.incr(key + '.builds')
+                statsd.statsd.timing(key + '.runtime', dt)
+                statsd.statsd.incr(key + '.builds')
 
                 key += '.%s' % UPSTREAM_BRANCH
-                statsd.timing(key + '.runtime', dt)
-                statsd.incr(key + '.builds')
+                statsd.statsd.timing(key + '.runtime', dt)
+                statsd.statsd.incr(key + '.builds')
 
                 key += '.%s' % machine.base_image.provider.name
-                statsd.timing(key + '.runtime', dt)
-                statsd.incr(key + '.builds')
-    except:
+                statsd.statsd.timing(key + '.runtime', dt)
+                statsd.statsd.incr(key + '.builds')
+    except Exception:
         print "Error getting build information"
         traceback.print_exc()
 

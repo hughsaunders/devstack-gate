@@ -23,7 +23,7 @@ import time
 import testtools
 from testtools import content
 
-import vmdatabase
+from devstack_gate import vmdatabase
 
 
 class TestVMDatabase(testtools.TestCase):

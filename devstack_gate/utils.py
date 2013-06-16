@@ -18,16 +18,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import novaclient
-from novaclient.v1_1 import client as Client
+import socket
 import time
 import traceback
-import paramiko
-import socket
-from sshclient import SSHClient
-from statsd import statsd
 
-import vmdatabase
+import novaclient
+from novaclient.v1_1 import client as Client
+import paramiko
+import statsd
+
+from devstack_gate.sshclient import SSHClient
+from devstack_gate import vmdatabase
 
 
 def iterate_timeout(max_seconds, purpose):
@@ -105,7 +106,7 @@ def add_public_ip(server):
     for count in iterate_timeout(600, "ip to be added"):
         try:
             newip = ip.manager.get(ip.id)
-        except:
+        except Exception:
             print "Unable to get ip details, will retry"
             traceback.print_exc()
             continue
@@ -129,7 +130,7 @@ def wait_for_resource(wait_resource):
     for count in iterate_timeout(21600, "waiting for %s" % wait_resource):
         try:
             resource = wait_resource.manager.get(wait_resource.id)
-        except:
+        except Exception:
             print "Unable to list resources, will retry"
             traceback.print_exc()
             continue
@@ -165,7 +166,7 @@ def delete_server(server):
                 if addr.instance_id == server.id:
                     server.remove_floating_ip(addr)
                     addr.delete()
-    except:
+    except Exception:
         print "Unable to remove floating IP"
         traceback.print_exc()
 
@@ -174,7 +175,7 @@ def delete_server(server):
             for kp in server.manager.api.keypairs.list():
                 if kp.name == server.key_name:
                     kp.delete()
-    except:
+    except Exception:
         print "Unable to delete keypair"
         traceback.print_exc()
 
@@ -205,19 +206,19 @@ def update_stats(provider):
             if machine.state not in states:
                 continue
             states[machine.state] += 1
-        if statsd:
+        if statsd.statsd:
             for state_id, count in states.items():
                 key = 'devstack.pool.%s.%s.%s' % (
                     provider.name,
                     base_image.name,
                     state_names[state_id])
-                statsd.gauge(key, count)
+                statsd.statsd.gauge(key, count)
 
             key = 'devstack.pool.%s.%s.min_ready' % (
                 provider.name,
                 base_image.name)
-            statsd.gauge(key, base_image.min_ready)
+            statsd.statsd.gauge(key, base_image.min_ready)
 
-    if statsd:
+    if statsd.statsd:
         key = 'devstack.pool.%s.max_servers' % provider.name
-        statsd.gauge(key, provider.max_servers)
+        statsd.statsd.gauge(key, provider.max_servers)

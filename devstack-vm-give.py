@@ -19,14 +19,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
 import commands
 import json
-import urllib2
+import os
+import sys
 import tempfile
+import urllib2
 
-import vmdatabase
+from devstack_gate import vmdatabase
 
 NODE_ID = sys.argv[1]
 

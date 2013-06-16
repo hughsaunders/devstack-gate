@@ -18,10 +18,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import os
+import sys
 
-import vmdatabase
+from devstack_gate import vmdatabase
 
 IMAGE_NAME = sys.argv[1]
 

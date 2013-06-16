@@ -20,7 +20,7 @@
 
 import sys
 
-import vmdatabase
+from devstack_gate import vmdatabase
 
 RESULT_ID = sys.argv[1]
 RESULT = sys.argv[2]

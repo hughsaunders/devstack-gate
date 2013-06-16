@@ -404,8 +404,10 @@ class VMDatabase(object):
         return self.session.query(Machine).filter_by(jenkins_name=name)[0]
 
     def getMachineForUse(self, image_name):
-        """Atomically find a machine that is ready for use, and update
-        its state."""
+        """Atomically find a machine.
+
+        Find a machien that is ready for use, and update its state.
+        """
         for machine in self.session.query(Machine).filter(
             machine_table.c.state == READY).order_by(
             machine_table.c.state_time):

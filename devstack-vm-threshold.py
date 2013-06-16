@@ -18,10 +18,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import vmdatabase
+import getopt
 import os
 import sys
-import getopt
+
+from devstack_gate import vmdatabase
 
 
 def main(threshold, stat_file):

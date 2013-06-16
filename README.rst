@@ -240,7 +240,7 @@ you're working as is called "jenkins")::
     cd /home/jenkins/workspace
     git clone https://github.com/openstack-infra/devstack-gate
     cd devstack-gate
-    python vmdatabase.py
+    python devstack_gate/vmdatabase.py
     sqlite3 /home/jenkins/vm.db
 
 With the database open, you'll want to populate the provider and base_image
@@ -256,13 +256,13 @@ Then run::
 
     ./devstack-vm-update-image.sh <YOUR PROVIDER NAME>
     ./devstack-vm-launch.py <YOUR PROVIDER NAME>
-    python vmdatabase.py
+    python devstack_gate/vmdatabase.py
 
 So that you don't need an entire Jenkins environment during
 development, The SKIP_DEVSTACK_GATE_JENKINS variable will cause the
 launch and reap scripts to omit making changes to Jenkins.  You'll
 need to pick a machine to use yourself, so chose an IP from the output
-from 'python vmdatabase.py' and then run::
+from 'python devstack_gate/vmdatabase.py' and then run::
 
     ./devstack-vm-gate-dev.sh <IP>
 

@@ -19,16 +19,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import ConfigParser
 import os
 import sys
 import time
 import traceback
-import ConfigParser
-from statsd import statsd
 
-import myjenkins
-import vmdatabase
-import utils
+import statsd
+
+from devstack_gate import myjenkins
+from devstack_gate import utils
+from devstack_gate import vmdatabase
 
 PROVIDER_NAME = sys.argv[1]
 DEVSTACK_GATE_PREFIX = os.environ.get('DEVSTACK_GATE_PREFIX', '')
@@ -110,7 +111,7 @@ def create_jenkins_node(jenkins, machine):
 def check_machine(jenkins, client, machine, error_counts):
     try:
         server = client.servers.get(machine.external_id)
-    except:
+    except Exception:
         print "Unable to get server detail, will retry"
         traceback.print_exc()
         return
@@ -126,11 +127,11 @@ def check_machine(jenkins, client, machine, error_counts):
         machine.ip = ip
         print "Machine %s is running, testing ssh" % machine.id
         if utils.ssh_connect(ip, 'jenkins'):
-            if statsd:
+            if statsd.statsd:
                 dt = int((time.time() - machine.state_time) * 1000)
                 key = 'devstack.launch.%s' % machine.base_image.provider.name
-                statsd.timing(key, dt)
-                statsd.incr(key)
+                statsd.statsd.timing(key, dt)
+                statsd.statsd.incr(key)
             print "Adding machine %s to Jenkins" % machine.id
             create_jenkins_node(jenkins, machine)
             print "Machine %s is ready" % machine.id
@@ -144,15 +145,15 @@ def check_machine(jenkins, client, machine, error_counts):
                                                     server.status,
                                                     count)
         if count >= 5:
-            if statsd:
-                statsd.incr('devstack.error.%s' %
-                            machine.base_image.provider.name)
+            if statsd.statsd:
+                statsd.statsd.incr(
+                    'devstack.error.%s' % machine.base_image.provider.name)
             raise Exception("Too many errors querying machine %s" % machine.id)
     else:
         if time.time() - machine.state_time >= ABANDON_TIMEOUT:
-            if statsd:
-                statsd.incr('devstack.timeout.%s' %
-                            machine.base_image.provider.name)
+            if statsd.statsd:
+                statsd.statsd.incr(
+                    'devstack.timeout.%s' % machine.base_image.provider.name)
             raise Exception("Waited too long for machine %s" % machine.id)
 
 
@@ -200,7 +201,7 @@ def main():
                                               flavor,
                                               last_name)
                 last_name = machine.name
-            except:
+            except Exception:
                 traceback.print_exc()
                 error = True
 
@@ -215,7 +216,7 @@ def main():
         for machine in building_machines:
             try:
                 check_machine(jenkins, client, machine, error_counts)
-            except:
+            except Exception:
                 traceback.print_exc()
                 print "Abandoning machine %s" % machine.id
                 machine.state = vmdatabase.ERROR

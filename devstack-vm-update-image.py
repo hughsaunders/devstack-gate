@@ -19,16 +19,16 @@
 # limitations under the License.
 
 
-import sys
 import os
-import time
-import subprocess
-import traceback
 import pprint
+import subprocess
+import sys
+import time
+import traceback
 
-import vmdatabase
-import utils
-from sshclient import SSHClient
+from devstack_gate.sshclient import SSHClient
+from devstack_gate import utils
+from devstack_gate import vmdatabase
 
 WORKSPACE = os.environ['WORKSPACE']
 DEVSTACK_GATE_PREFIX = os.environ.get('DEVSTACK_GATE_PREFIX', '')
@@ -90,7 +90,7 @@ def tokenize(fn, tokens, distribution, comment=None):
         if 'dist:' in line and ('dist:%s' % distribution not in line):
             continue
         if 'qpid' in line:
-            continue  # TODO: explain why this is here
+            continue  # TODO(jeblair): explain why this is here
         if comment and comment in line:
             line = line[:line.rfind(comment)]
         line = line.strip()
@@ -229,7 +229,7 @@ def configure_server(server, branches):
             try:
                 client.ssh('check for %s' % fname,
                            'ls ~/cache/files/%s' % fname)
-            except:
+            except Exception:
                 client.ssh('download image %s' % fname,
                     'wget -nv -c %s -O ~/cache/files/%s' % (url, fname))
 
@@ -255,7 +255,7 @@ def snapshot_server(client, server, name):
     if hasattr(client.images, 'create'):  # v1.0
         image = client.images.create(server, name)
     else:
-        # TODO: fix novaclient so it returns an image here
+        # TODO(jeblair): fix novaclient so it returns an image here
         # image = server.create_image(name)
         uuid = server.manager.create_image(server, name)
         image = client.images.get(uuid)
@@ -295,7 +295,7 @@ def build_image(provider, client, base_image, image,
         # if we fail.  The reap script will find it and try again.
         try:
             utils.delete_server(server)
-        except:
+        except Exception:
             print "Exception encountered deleting server:"
             traceback.print_exc()
     except Exception:

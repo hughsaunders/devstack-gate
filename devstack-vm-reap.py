@@ -18,16 +18,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import ConfigParser
 import os
 import sys
 import time
 import traceback
-import ConfigParser
 
-import myjenkins
-import vmdatabase
-import utils
 import novaclient
+
+from devstack_gate import myjenkins
+from devstack_gate import utils
+from devstack_gate import vmdatabase
 
 PROVIDER_NAME = sys.argv[1]
 MACHINE_LIFETIME = 24 * 60 * 60  # Amount of time after being used
@@ -137,7 +138,7 @@ def main():
             print 'Deleting machine', machine.name
             try:
                 delete_machine(jenkins, client, machine)
-            except:
+            except Exception:
                 error = True
                 traceback.print_exc()
 
@@ -153,7 +154,7 @@ def main():
                 print 'Deleting image', snap_image.name
                 try:
                     delete_image(client, snap_image)
-                except:
+                except Exception:
                     error = True
                     traceback.print_exc()
 

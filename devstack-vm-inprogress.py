@@ -18,14 +18,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
 import ConfigParser
-
-import myjenkins
-import vmdatabase
-import utils
+import os
 import re
+import sys
+
+from devstack_gate import myjenkins
+from devstack_gate import utils
+from devstack_gate import vmdatabase
 
 NODE_NAME = sys.argv[1]
 DEVSTACK_GATE_SECURE_CONFIG = os.environ.get('DEVSTACK_GATE_SECURE_CONFIG',
