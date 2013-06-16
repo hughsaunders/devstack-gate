@@ -19,8 +19,7 @@
 # limitations under the License.
 
 import novaclient
-from novaclient.v1_1 import client as Client11
-from v1_0 import client as Client10
+from novaclient.v1_1 import client as Client
 import time
 import os
 import traceback
@@ -51,14 +50,6 @@ def get_client(provider):
         kwargs['service_name'] = provider.nova_service_name
     if provider.nova_service_region:
         kwargs['region_name'] = provider.nova_service_region
-    if provider.nova_api_version == '1.0':
-        Client = Client10.Client
-    elif provider.nova_api_version == '1.1':
-        Client = Client11.Client
-    else:
-        raise Exception("API version not supported")
-    if provider.nova_rax_auth:
-        os.environ['NOVA_RAX_AUTH'] = '1'
     client = Client(*args, **kwargs)
     return client
 

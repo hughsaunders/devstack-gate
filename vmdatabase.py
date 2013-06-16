@@ -58,9 +58,9 @@ provider_table = Table('provider', metadata,
     Column('max_servers', Integer),
     # May we give failed vms from this provider to developers?
     Column('giftable', Boolean),
-    # 1.0 or 1.1
+    # 1.0 or 1.1 - no longer needed
     Column('nova_api_version', String(8)),
-    # novaclient doesn't discover this itself
+    # novaclient doesn't discover this itself - no longer needed
     Column('nova_rax_auth', Boolean),
     Column('nova_username', String(255)),
     Column('nova_api_key', String(255)),
