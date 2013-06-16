@@ -230,13 +230,15 @@ def configure_server(server, branches):
                 client.ssh('check for %s' % fname,
                            'ls ~/cache/files/%s' % fname)
             except Exception:
-                client.ssh('download image %s' % fname,
+                client.ssh(
+                    'download image %s' % fname,
                     'wget -nv -c %s -O ~/cache/files/%s' % (url, fname))
 
     client.ssh('clear workspace', 'rm -rf ~/workspace-cache')
     client.ssh('make workspace', 'mkdir -p ~/workspace-cache')
     for project in PROJECTS:
-        client.ssh('clone %s' % project,
+        client.ssh(
+            'clone %s' % project,
             'cd ~/workspace-cache && '
             'git clone https://review.openstack.org/p/%s' % project)
 
@@ -244,7 +246,8 @@ def configure_server(server, branches):
     if script and os.path.isfile(script):
         bn = os.path.basename(script)
         client.scp(script, '/tmp/%s' % bn)
-        client.ssh('run custom script %s' % bn,
+        client.ssh(
+            'run custom script %s' % bn,
             'chmod +x /tmp/%s && sudo /tmp/%s' % (bn, bn))
 
     client.ssh('sync', 'sync && sleep 5')

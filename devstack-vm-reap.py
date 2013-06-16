@@ -32,9 +32,9 @@ from devstack_gate import vmdatabase
 
 PROVIDER_NAME = sys.argv[1]
 MACHINE_LIFETIME = 24 * 60 * 60  # Amount of time after being used
-DEVSTACK_GATE_SECURE_CONFIG = os.environ.get('DEVSTACK_GATE_SECURE_CONFIG',
-                                             os.path.expanduser(
-                                                '~/devstack-gate-secure.conf'))
+DEVSTACK_GATE_SECURE_CONFIG = os.environ.get(
+    'DEVSTACK_GATE_SECURE_CONFIG', os.path.expanduser(
+        '~/devstack-gate-secure.conf'))
 SKIP_DEVSTACK_GATE_JENKINS = os.environ.get('SKIP_DEVSTACK_GATE_JENKINS', None)
 
 if '--all-servers' in sys.argv:
@@ -134,7 +134,7 @@ def main():
             (machine.state != vmdatabase.READY and
              now - machine.state_time > MACHINE_LIFETIME) or
             machine.state == vmdatabase.DELETE or
-            machine.state == vmdatabase.ERROR):
+                machine.state == vmdatabase.ERROR):
             print 'Deleting machine', machine.name
             try:
                 delete_machine(jenkins, client, machine)
@@ -150,7 +150,7 @@ def main():
             # for 24 hours, unless the image is the current snapshot
             if (REAP_ALL_IMAGES or
                 (snap_image != base_image.current_snapshot and
-                now - snap_image.state_time > MACHINE_LIFETIME)):
+                    now - snap_image.state_time > MACHINE_LIFETIME)):
                 print 'Deleting image', snap_image.name
                 try:
                     delete_image(client, snap_image)

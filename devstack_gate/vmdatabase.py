@@ -43,14 +43,14 @@ RESULT_SUCCESS = 1
 RESULT_FAILURE = 2
 RESULT_TIMEOUT = 3
 
-from sqlalchemy import Table, Column, Boolean, Integer, String, \
-                       MetaData, ForeignKey, \
-                       create_engine, and_
+from sqlalchemy import MetaData, ForeignKey, create_engine, and_
+from sqlalchemy import Table, Column, Boolean, Integer, String
 from sqlalchemy.orm import mapper, relation
 from sqlalchemy.orm.session import Session, sessionmaker
 
 metadata = MetaData()
-provider_table = Table('provider', metadata,
+provider_table = Table(
+    'provider', metadata,
     Column('id', Integer, primary_key=True),
     Column('name', String(255), index=True, unique=True),
     # Max total number of servers for this provider
@@ -73,8 +73,9 @@ provider_table = Table('provider', metadata,
     Column('nova_service_region', String(255)),
     # endpoint selection: Endpoint name (Null for default)
     Column('nova_service_name', String(255)),
-    )
-base_image_table = Table('base_image', metadata,
+)
+base_image_table = Table(
+    'base_image', metadata,
     Column('id', Integer, primary_key=True),
     Column('provider_id', Integer, ForeignKey('provider.id'),
     index=True, nullable=False),
@@ -87,8 +88,9 @@ base_image_table = Table('base_image', metadata,
     # amount of ram to select for servers with this image
     Column('min_ram', Integer),
     #active?
-    )
-snapshot_image_table = Table('snapshot_image', metadata,
+)
+snapshot_image_table = Table(
+    'snapshot_image', metadata,
     Column('id', Integer, primary_key=True),
     Column('name', String(255)),
     Column('base_image_id', Integer, ForeignKey('base_image.id'),
@@ -103,8 +105,9 @@ snapshot_image_table = Table('snapshot_image', metadata,
     Column('state', Integer),
     # Time of last state change
     Column('state_time', Integer),
-    )
-machine_table = Table('machine', metadata,
+)
+machine_table = Table(
+    'machine', metadata,
     Column('id', Integer, primary_key=True),
     Column('base_image_id', Integer, ForeignKey('base_image.id'),
     index=True, nullable=False),
@@ -122,8 +125,9 @@ machine_table = Table('machine', metadata,
     Column('state', Integer),
     # Time of last state change
     Column('state_time', Integer),
-    )
-result_table = Table('result', metadata,
+)
+result_table = Table(
+    'result', metadata,
     Column('id', Integer, primary_key=True),
     Column('base_image_id', Integer, ForeignKey('base_image.id'),
     index=True, nullable=False),
@@ -139,7 +143,7 @@ result_table = Table('result', metadata,
     Column('end_time', Integer),
     # Result of job
     Column('result', Integer),
-    )
+)
 
 
 class Provider(object):
@@ -165,15 +169,15 @@ class Provider(object):
     def getBaseImage(self, name):
         session = Session.object_session(self)
         return session.query(BaseImage).filter(and_(
-                base_image_table.c.name == name,
-                base_image_table.c.provider_id == self.id)).first()
+            base_image_table.c.name == name,
+            base_image_table.c.provider_id == self.id)).first()
 
     def _machines(self):
         session = Session.object_session(self)
         return session.query(Machine).filter(and_(
-                machine_table.c.base_image_id == base_image_table.c.id,
-                base_image_table.c.provider_id == self.id)).order_by(
-            machine_table.c.state_time)
+            machine_table.c.base_image_id == base_image_table.c.id,
+            base_image_table.c.provider_id == self.id)).order_by(
+                machine_table.c.state_time)
 
     @property
     def machines(self):
@@ -216,9 +220,9 @@ class BaseImage(object):
     def ready_snapshot_images(self):
         session = Session.object_session(self)
         return session.query(SnapshotImage).filter(and_(
-                snapshot_image_table.c.base_image_id == self.id,
-                snapshot_image_table.c.state == READY)).order_by(
-            snapshot_image_table.c.version).all()
+            snapshot_image_table.c.base_image_id == self.id,
+            snapshot_image_table.c.state == READY)).order_by(
+                snapshot_image_table.c.version).all()
 
     @property
     def current_snapshot(self):
@@ -230,7 +234,7 @@ class BaseImage(object):
         session = Session.object_session(self)
         return session.query(Machine).filter(
             machine_table.c.base_image_id == self.id).order_by(
-            machine_table.c.state_time)
+                machine_table.c.state_time)
 
     @property
     def building_machines(self):
@@ -332,32 +336,32 @@ class Result(object):
 mapper(Result, result_table)
 
 mapper(Machine, machine_table, properties=dict(
-        _state=machine_table.c.state,
-        ))
+       _state=machine_table.c.state,
+       ))
 
 mapper(SnapshotImage, snapshot_image_table, properties=dict(
-        _state=snapshot_image_table.c.state,
-        ))
+       _state=snapshot_image_table.c.state,
+       ))
 
 mapper(BaseImage, base_image_table, properties=dict(
-        snapshot_images=relation(SnapshotImage,
-                                 order_by=snapshot_image_table.c.version,
-                                 cascade='all, delete-orphan',
-                                 backref='base_image'),
-        machines=relation(Machine,
-                          order_by=machine_table.c.state_time,
-                          cascade='all, delete-orphan',
-                          backref='base_image'),
-        results=relation(Result,
-                         order_by=result_table.c.start_time,
+       snapshot_images=relation(SnapshotImage,
+                                order_by=snapshot_image_table.c.version,
+                                cascade='all, delete-orphan',
+                                backref='base_image'),
+       machines=relation(Machine,
+                         order_by=machine_table.c.state_time,
                          cascade='all, delete-orphan',
-                         backref='base_image')))
+                         backref='base_image'),
+       results=relation(Result,
+                        order_by=result_table.c.start_time,
+                        cascade='all, delete-orphan',
+                        backref='base_image')))
 
 mapper(Provider, provider_table, properties=dict(
-        base_images=relation(BaseImage,
-                             order_by=base_image_table.c.name,
-                             cascade='all, delete-orphan',
-                             backref='provider')))
+       base_images=relation(BaseImage,
+                            order_by=base_image_table.c.name,
+                            cascade='all, delete-orphan',
+                            backref='provider')))
 
 
 class VMDatabase(object):
@@ -409,8 +413,8 @@ class VMDatabase(object):
         Find a machien that is ready for use, and update its state.
         """
         for machine in self.session.query(Machine).filter(
-            machine_table.c.state == READY).order_by(
-            machine_table.c.state_time):
+                machine_table.c.state == READY).order_by(
+                machine_table.c.state_time):
             if machine.base_image.name == image_name:
                 machine.state = USED
                 self.commit()

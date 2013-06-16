@@ -33,9 +33,9 @@ from devstack_gate import vmdatabase
 
 PROVIDER_NAME = sys.argv[1]
 DEVSTACK_GATE_PREFIX = os.environ.get('DEVSTACK_GATE_PREFIX', '')
-DEVSTACK_GATE_SECURE_CONFIG = os.environ.get('DEVSTACK_GATE_SECURE_CONFIG',
-                                 os.path.expanduser(
-                                 '~/devstack-gate-secure.conf'))
+DEVSTACK_GATE_SECURE_CONFIG = os.environ.get(
+    'DEVSTACK_GATE_SECURE_CONFIG', os.path.expanduser(
+        '~/devstack-gate-secure.conf'))
 SKIP_DEVSTACK_GATE_JENKINS = os.environ.get('SKIP_DEVSTACK_GATE_JENKINS', None)
 
 ABANDON_TIMEOUT = 900   # assume a machine will never boot if it hasn't

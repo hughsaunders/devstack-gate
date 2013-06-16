@@ -191,7 +191,7 @@ def update_stats(provider):
         vmdatabase.ERROR: 'error',
         vmdatabase.HOLD: 'hold',
         vmdatabase.DELETE: 'delete',
-        }
+    }
 
     for base_image in provider.base_images:
         states = {
@@ -201,7 +201,7 @@ def update_stats(provider):
             vmdatabase.ERROR: 0,
             vmdatabase.HOLD: 0,
             vmdatabase.DELETE: 0,
-            }
+        }
         for machine in base_image.machines:
             if machine.state not in states:
                 continue

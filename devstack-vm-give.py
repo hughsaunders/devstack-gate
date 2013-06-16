@@ -36,9 +36,9 @@ def main():
     machine = db.getMachine(NODE_ID)
 
     stat, out = commands.getstatusoutput(
-      "ssh -p 29418 review.openstack.org gerrit" +
-      "query --format=JSON change:%s" %
-      os.environ['GERRIT_CHANGE_NUMBER'])
+        "ssh -p 29418 review.openstack.org gerrit" +
+        "query --format=JSON change:%s" %
+        os.environ['GERRIT_CHANGE_NUMBER'])
 
     data = json.loads(out.split('\n')[0])
     username = data['owner']['username']
@@ -62,7 +62,7 @@ cat <<EOF >>~/.ssh/authorized_keys
             raise Exception("Unable to copy keys")
 
         stat, out = commands.getstatusoutput(
-          "ssh %s /bin/sh /var/tmp/keys.sh" % machine.ip)
+            "ssh %s /bin/sh /var/tmp/keys.sh" % machine.ip)
 
         if stat:
             print out
