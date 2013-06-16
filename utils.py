@@ -30,6 +30,7 @@ from statsd import statsd
 
 import vmdatabase
 
+
 def iterate_timeout(max_seconds, purpose):
     start = time.time()
     count = 0
@@ -54,6 +55,8 @@ def get_client(provider):
     return client
 
 extension_cache = {}
+
+
 def get_extensions(client):
     global extension_cache
     cache = extension_cache.get(client)
@@ -67,10 +70,12 @@ def get_extensions(client):
     extension_cache[client] = extensions
     return extensions
 
+
 def get_flavor(client, min_ram):
     flavors = [f for f in client.flavors.list() if f.ram >= min_ram]
     flavors.sort(lambda a, b: cmp(a.ram, b.ram))
     return flavors[0]
+
 
 def get_public_ip(server, version=4):
     if 'os-floating-ips' in get_extensions(server.manager.api):
@@ -92,6 +97,7 @@ def get_public_ip(server, version=4):
             return addr['addr']
     return None
 
+
 def add_public_ip(server):
     ip = server.manager.api.floating_ips.create()
     print "created floating ip", ip
@@ -108,11 +114,13 @@ def add_public_ip(server):
             print 'ip has been added'
             return
 
+
 def add_keypair(client, name):
     key = paramiko.RSAKey.generate(2048)
     public_key = key.get_name() + ' ' + key.get_base64()
     kp = client.keypairs.create(name, public_key)
     return key, kp
+
 
 def wait_for_resource(wait_resource):
     last_progress = None
@@ -137,6 +145,7 @@ def wait_for_resource(wait_resource):
         if resource.status == 'ACTIVE':
             return resource
 
+
 def ssh_connect(ip, username, connect_kwargs={}, timeout=60):
     # HPcloud may return errno 111 for about 30 seconds after adding the IP
     for count in iterate_timeout(timeout, "ssh access"):
@@ -150,6 +159,7 @@ def ssh_connect(ip, username, connect_kwargs={}, timeout=60):
     if "access okay" in out:
         return client
     return None
+
 
 def delete_server(server):
     try:
@@ -173,6 +183,7 @@ def delete_server(server):
 
     print "Deleting server", server.id
     server.delete()
+
 
 def update_stats(provider):
     state_names = {
