@@ -17,18 +17,26 @@ integration test and ensures that a proposed change still enables
 several of the projects to work together. Currently, any proposed
 change to the following projects must pass the devstack gate test::
 
-    nova
-    glance
-    keystone
-    horizon
-    quantum
-    python-novaclient
-    python-keystoneclient
-    python-quantumclient
-    devstack
-    devstack-gate
+  - openstack-dev/devstack
+  - openstack-dev/grenade
+  - openstack-dev/pbr
+  - openstack/cinder
+  - openstack/glance
+  - openstack/horizon
+  - openstack/keystone
+  - openstack/nova
+  - openstack/quantum
+  - openstack/swift
+  - openstack/python-cinderclient
+  - openstack/python-glanceclient
+  - openstack/python-keystoneclient
+  - openstack/python-novaclient
+  - openstack/python-openstackclient
+  - openstack/python-quantumclient
+  - openstack/python-swiftclient
+  - openstack/tempest
 
-Obviously we test nova, glance, keystone, horizon, quantum and their clients
+Obviously we test the integrated OpenStack projects and their clients
 because they all work closely together to form an OpenStack
 system. Changes to devstack itself are also required to pass this test
 so that we can be assured that devstack is always able to produce a
