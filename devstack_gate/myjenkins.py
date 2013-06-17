@@ -20,7 +20,8 @@ class Jenkins(jenkins.Jenkins):
         if info['offline']:
             return
         self.jenkins_open(
-            urllib2.Request(self.server + TOGGLE_OFFLINE % locals()))
+            urllib2.Request(
+                self.server + TOGGLE_OFFLINE % {'name': name, 'msg': msg}))
 
     def enable_node(self, name):
         '''Enable a node.
@@ -33,14 +34,15 @@ class Jenkins(jenkins.Jenkins):
             return
         msg = ''
         self.jenkins_open(
-            urllib2.Request(self.server + TOGGLE_OFFLINE % locals()))
+            urllib2.Request(
+                self.server + TOGGLE_OFFLINE % {'name': name, 'msg': msg}))
 
     def get_node_config(self, name):
         '''Get the configuration for a node.
 
         :param name: Jenkins node name, ``str``
         '''
-        get_config_url = self.server + CONFIG_NODE % locals()
+        get_config_url = self.server + CONFIG_NODE % {'name': name}
         return self.jenkins_open(urllib2.Request(get_config_url))
 
     def reconfig_node(self, name, config_xml):
@@ -50,7 +52,7 @@ class Jenkins(jenkins.Jenkins):
         :param config_xml: New XML configuration, ``str``
         '''
         headers = {'Content-Type': 'text/xml'}
-        reconfig_url = self.server + CONFIG_NODE % locals()
+        reconfig_url = self.server + CONFIG_NODE % {'name': name}
         self.jenkins_open(urllib2.Request(reconfig_url, config_xml, headers))
 
     def create_node(self, name, numExecutors=2, nodeDescription=None,
